@@ -6,6 +6,10 @@ import MovieCard from '../components/MovieCard'
 
 export class Movies extends Component {
 
+    state = {
+        page : 1
+    }
+
     componentDidMount() {
         this.props.fetchMovies()
     }
@@ -14,14 +18,14 @@ export class Movies extends Component {
         this.props.navigation.navigate('MovieDetail', { movie })
     }
 
+    loadMoreMovies = () => {
+        this.setState({
+            page : this.state.page += 1
+        })
+        this.props.fetchMovies(this.state.page)
+    }
+
     render() {
-        if(this.props.loading) {
-            return (
-                <View style={{flex : 1, padding : 20}}>
-                    <ActivityIndicator/>
-                </View>
-            )
-        }
 
         return(
             <View style={{flex: 1, marginBottom : 10}}>
@@ -33,8 +37,15 @@ export class Movies extends Component {
                         NOW PLAYING
                     </Text>
                 </View>
+
+                {this.props.loading && ( 
+                    <View style={{flex : 1, padding : 20}}>
+                        <ActivityIndicator/>
+                    </View>
+                )}
+
                 <FlatList
-                    data={this.props.movies.results}
+                    data={this.props.movies}
                     renderItem={({item}) => {
                     return (<MovieCard
                         key={item.id}
@@ -43,6 +54,8 @@ export class Movies extends Component {
                     ></MovieCard>)}
                     }
                     keyExtractor={({id}) => id}
+                    onEndReached={ () => this.loadMoreMovies() }
+                    onEndReachedThreshold={0.01}
                 />
             </View>
         )
@@ -58,7 +71,7 @@ const mapStateToProps = (state) => {
 }
   
 const mapDispatchToProps = (dispatch) => ({
-    fetchMovies: () => {dispatch(fetchMovies())}
+    fetchMovies: (payload) => {dispatch(fetchMovies(payload))}
 })
   
   export default connect(mapStateToProps, mapDispatchToProps)(Movies)

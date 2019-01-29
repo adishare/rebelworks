@@ -9,7 +9,7 @@ export default ( state = initialState, { type, payload }) => {
         case 'FETCH_MOVIES_CALL' :
             return { ...state, loading : true }
         case 'FETCH_MOVIES_COMPLETE' :
-            return { ...state, loading : false, movies : payload }
+            return { ...state, loading : false, movies : [...state.movies, ...payload] }
         case 'FETC_MOVIES_FAIL' :
             return { ...state, loading : false, error : payload }
         default:
